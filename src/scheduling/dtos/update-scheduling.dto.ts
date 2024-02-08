@@ -2,6 +2,7 @@ import { IsNotEmpty, IsDate, MinLength, MinDate, IsOptional, IsEnum } from "clas
 import { ServiceType } from "../scheduling.entity";
 import { Type, Exclude } from "class-transformer";
 
+// TODO refact to replace similar code to CreateSchedulingDto
 export class UpdateSchedulingDto {
     // TODO avoid changing id field
     id: number;

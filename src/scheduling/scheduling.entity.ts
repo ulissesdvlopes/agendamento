@@ -17,10 +17,11 @@ export class Scheduling extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number
 
+    // TODO create entity vehicle
     @Column({ nullable: false, type: 'varchar', length: 200 })
     vehicle: string;
 
-    @Column({ type: 'timestamptz', nullable: true })
+    @Column({ type: 'timestamptz', nullable: false })
     date: Date;
 
     @Column({

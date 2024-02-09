@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Delete, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, Patch, UseGuards } from '@nestjs/common';
 import { SchedulingService } from './scheduling.service';
 import { CreateSchedulingDto } from './dtos/create-scheduling.dto';
 import { UpdateSchedulingDto } from './dtos/update-scheduling.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('scheduling')
 export class SchedulingController {
@@ -18,6 +19,7 @@ export class SchedulingController {
     }
 
     @Post()
+    @UseGuards(AuthGuard('jwt'))
     create(@Body() createSchedulingDto: CreateSchedulingDto) {
         return this.schedulingService.createScheduling(createSchedulingDto);
     }

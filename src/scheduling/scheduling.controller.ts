@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Delete, Patch, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, Patch, UseGuards, Req, Query, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { SchedulingService } from './scheduling.service';
 import { CreateSchedulingDto } from './dtos/create-scheduling.dto';
 import { UpdateSchedulingDto } from './dtos/update-scheduling.dto';
@@ -11,20 +11,22 @@ export class SchedulingController {
 
     @Get()
     @UseGuards(AuthGuard('jwt'))
-    getList(@Req() request: RequestWithUser) {
-        return this.schedulingService.getAllSchedulings(request.user);
+    getList(@Req() request: RequestWithUser, @Query('vehicle') vehicle: string, @Query('serviceType') serviceType: string) {
+        return this.schedulingService.getAllSchedulings(request.user, vehicle, serviceType);
     }
 
     @Get(':id')
     @UseGuards(AuthGuard('jwt'))
+    @UseInterceptors(ClassSerializerInterceptor)
     getById(@Param('id') id: string, @Req() request: RequestWithUser) {
+        console.log('aqui');
+        
         return this.schedulingService.getSchedulingById(Number(id), request.user);
     }
 
     @Post()
     @UseGuards(AuthGuard('jwt'))
     create(@Body() createSchedulingDto: CreateSchedulingDto, @Req() request: RequestWithUser) {
-        console.log(request.user);
         return this.schedulingService.createScheduling(createSchedulingDto, request.user);
     }
 

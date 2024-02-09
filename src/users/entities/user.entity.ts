@@ -14,6 +14,7 @@ export class User {
     public name: string;
     
     @Column()
+    @Exclude()
     public password: string;
 
     @OneToMany(

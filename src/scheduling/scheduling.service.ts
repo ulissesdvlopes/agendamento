@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { Scheduling } from './scheduling.entity';
+import { DeleteResult, ILike, Repository, UpdateResult } from 'typeorm';
+import { Scheduling, ServiceType } from './scheduling.entity';
 import { CreateSchedulingDto } from './dtos/create-scheduling.dto';
 import { UpdateSchedulingDto } from './dtos/update-scheduling.dto';
 import { User } from 'src/users/entities/user.entity';
+import SchedulingFilters from './schedulingFilters.interface';
 
 @Injectable()
 export class SchedulingService {
@@ -14,9 +15,22 @@ export class SchedulingService {
         private readonly schedulingRepository: Repository<Scheduling>,
     ) {}
 
-    getAllSchedulings(user: User): Promise<Scheduling[]> {
+    getAllSchedulings(user: User, vehicle: string, serviceType: string): Promise<Scheduling[]> {
+        let where: SchedulingFilters = {client: user}
+        if(vehicle) {
+            where = {...where, vehicle: ILike(`%${vehicle}%`)}
+        }
+        if(serviceType) {
+                        
+            const typeOfService: ServiceType = ServiceType[serviceType.toUpperCase() as keyof typeof ServiceType];
+            if(!typeOfService) {
+                throw new HttpException('Valor inválido para o tipo de serviço', HttpStatus.BAD_REQUEST)
+            }
+            
+            where = {...where, serviceType: typeOfService}
+        }
         return this.schedulingRepository.find({
-            where: { client: user }
+            where
         })
     }
 
@@ -31,6 +45,7 @@ export class SchedulingService {
         const scheduling: Scheduling = new Scheduling();
         scheduling.vehicle = createschedulingDto.vehicle;
         scheduling.date = createschedulingDto.date;
+        scheduling.serviceType = createschedulingDto.serviceType;
         scheduling.client = user;
         return this.schedulingRepository.save(scheduling);
     }

@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, HttpCode, Post, Req, Res, UseInterceptors } from '@nestjs/common';
 import RegisterDto from './dtos/register.dto';
 import { AuthService } from './auth.service';
 import LoginDto from './dtos/login.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
@@ -10,19 +10,20 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('register')
+    // @UseInterceptors(ClassSerializerInterceptor)
     register(@Body() registerDto: RegisterDto) {
         return this.authService.register(registerDto);
     }
 
     @HttpCode(200)
-    // @UseGuards(AuthGuard('jwt'))
     @Post('login')
-    async login(@Body() loginDto: LoginDto, @Res() response: Response) {
+    @UseInterceptors(ClassSerializerInterceptor)
+    async login(@Body() loginDto: LoginDto, @Req() request: Request) {
         const user = await this.authService.getAuthenticatedUser(loginDto);
         const cookie = this.authService.getCookieWithJwtToken(user);
-        response.setHeader('Set-Cookie', cookie);
+        request.res.setHeader('Set-Cookie', cookie);
 
-        return response.send(user);
+        return user;
     }
 
 }

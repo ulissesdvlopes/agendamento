@@ -30,7 +30,6 @@ export class AuthService {
 
     public async getAuthenticatedUser(loginDto: LoginDto) {
         try {
-            console.log(loginDto.email);
             const user: User = await this.usersService.getByEmail(loginDto.email);
             const isPasswordMatching = await bcrypt.compare(
                 loginDto.password,
@@ -42,7 +41,6 @@ export class AuthService {
             //   user.password = undefined;
             return user;
         } catch (error) {
-            // console.log(error);
             throw new HttpException('E-mail ou senha incorretos', HttpStatus.BAD_REQUEST);
         }
     }

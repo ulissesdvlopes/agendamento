@@ -1,9 +1,10 @@
-import { Body, ClassSerializerInterceptor, Controller, HttpCode, Post, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Body, ClassSerializerInterceptor, Controller, HttpCode, Post, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import RegisterDto from './dtos/register.dto';
 import { AuthService } from './auth.service';
 import LoginDto from './dtos/login.dto';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import RequestWithUser from './requestWithUser.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +25,13 @@ export class AuthController {
         request.res.setHeader('Set-Cookie', cookie);
 
         return user;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('logout')
+    async logout(@Req() request: RequestWithUser, @Res() response: Response) {
+        response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+        return response.sendStatus(200);
     }
 
 }

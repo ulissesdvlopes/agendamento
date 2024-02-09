@@ -10,13 +10,15 @@ export class SchedulingController {
     constructor(private readonly schedulingService: SchedulingService) {}
 
     @Get()
-    getList() {
-        return this.schedulingService.getAllSchedulings();
+    @UseGuards(AuthGuard('jwt'))
+    getList(@Req() request: RequestWithUser) {
+        return this.schedulingService.getAllSchedulings(request.user);
     }
 
     @Get(':id')
-    getById(@Param('id') id: string) {
-        return this.schedulingService.getSchedulingById(Number(id));
+    @UseGuards(AuthGuard('jwt'))
+    getById(@Param('id') id: string, @Req() request: RequestWithUser) {
+        return this.schedulingService.getSchedulingById(Number(id), request.user);
     }
 
     @Post()
@@ -27,13 +29,15 @@ export class SchedulingController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: number, @Body() updateSchedulingDto: UpdateSchedulingDto) {
-        return this.schedulingService.updateScheduling(id, updateSchedulingDto)
+    @UseGuards(AuthGuard('jwt'))
+    update(@Param('id') id: number, @Body() updateSchedulingDto: UpdateSchedulingDto, @Req() request: RequestWithUser) {
+        return this.schedulingService.updateScheduling(id, updateSchedulingDto, request.user)
     }
 
     @Delete(':id')
-    delete(@Param('id') id: number) {
-        return this.schedulingService.deleteScheduling(id)
+    @UseGuards(AuthGuard('jwt'))
+    delete(@Param('id') id: number, @Req() request: RequestWithUser) {
+        return this.schedulingService.deleteScheduling(id, request.user)
     }
 
 }

@@ -12,7 +12,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        console.log(request?.cookies?.Authentication);
         return request?.cookies?.Authentication;
       }]),
       // TODO configurar variáveis de ambiente
@@ -20,12 +19,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
  
-  async validate(payload: TokenPayload) {
-    console.log(payload);
-    
-    const user = await this.userService.findOne(payload.userId);
-    console.log(user);
-    
+  async validate(payload: TokenPayload) {    
+    const user = await this.userService.findOne(payload.userId);    
     return user
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Scheduling } from './scheduling.entity';
@@ -14,12 +14,17 @@ export class SchedulingService {
         private readonly schedulingRepository: Repository<Scheduling>,
     ) {}
 
-    getAllSchedulings(): Promise<Scheduling[]> {
-        return this.schedulingRepository.find()
+    getAllSchedulings(user: User): Promise<Scheduling[]> {
+        return this.schedulingRepository.find({
+            where: { client: user }
+        })
     }
 
-    getSchedulingById(id: number): Promise<Scheduling> {
-        return this.schedulingRepository.findOne({where: {id}, relations:{ client: true}})
+    async getSchedulingById(id: number, user: User): Promise<Scheduling> {
+        const scheduling: Scheduling = await this.schedulingRepository.findOne({where: {id}, relations:{ client: true}});
+        this.verifySchedulingExistence(scheduling);
+        this.handleUserPermission(scheduling, user);
+        return scheduling;
     }
 
     createScheduling(createschedulingDto: CreateSchedulingDto, user: User): Promise<Scheduling> {
@@ -30,12 +35,30 @@ export class SchedulingService {
         return this.schedulingRepository.save(scheduling);
     }
 
-    updateScheduling(id: number, updateSchedulingDto: UpdateSchedulingDto): Promise<UpdateResult> {
-        return this.schedulingRepository.update(id, updateSchedulingDto)
+    async updateScheduling(id: number, updateSchedulingDto: UpdateSchedulingDto, user: User): Promise<UpdateResult> {
+        const scheduling: Scheduling = await this.schedulingRepository.findOne({where: {id}, relations:{ client: true}});
+        this.verifySchedulingExistence(scheduling);
+        this.handleUserPermission(scheduling, user);
+        return this.schedulingRepository.update(id, updateSchedulingDto);
     }
 
-    deleteScheduling(id: number): Promise<DeleteResult> {
-        return this.schedulingRepository.delete(id)
+    async deleteScheduling(id: number, user: User): Promise<DeleteResult> {
+        const scheduling: Scheduling = await this.schedulingRepository.findOne({where: {id}, relations:{ client: true}});
+        this.verifySchedulingExistence(scheduling);
+        this.handleUserPermission(scheduling, user);
+        return this.schedulingRepository.delete(id);
+    }
+
+    private verifySchedulingExistence(scheduling: Scheduling) {
+        if(!scheduling) {
+            throw new HttpException('Agendamento não encontrado', HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private handleUserPermission(scheduling: Scheduling, user: User) {
+        if(scheduling.client.id !== user.id) {
+            throw new HttpException('Não é possível acessar esse agendamento', HttpStatus.UNAUTHORIZED);
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Scheduling } from './scheduling.entity';
 import { CreateSchedulingDto } from './dtos/create-scheduling.dto';
 import { UpdateSchedulingDto } from './dtos/update-scheduling.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class SchedulingService {
@@ -18,13 +19,14 @@ export class SchedulingService {
     }
 
     getSchedulingById(id: number): Promise<Scheduling> {
-        return this.schedulingRepository.findOneBy({id: id})
+        return this.schedulingRepository.findOne({where: {id}, relations:{ client: true}})
     }
 
-    createScheduling(createschedulingDto: CreateSchedulingDto): Promise<Scheduling> {
+    createScheduling(createschedulingDto: CreateSchedulingDto, user: User): Promise<Scheduling> {
         const scheduling: Scheduling = new Scheduling();
         scheduling.vehicle = createschedulingDto.vehicle;
         scheduling.date = createschedulingDto.date;
+        scheduling.client = user;
         return this.schedulingRepository.save(scheduling);
     }
 

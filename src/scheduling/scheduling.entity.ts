@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import {
     BaseEntity,
     Entity,
@@ -5,6 +6,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     PrimaryGeneratedColumn,
+    ManyToOne,
   } from 'typeorm';
 
 export enum ServiceType {
@@ -20,6 +22,12 @@ export class Scheduling extends BaseEntity {
     // TODO create entity vehicle
     @Column({ nullable: false, type: 'varchar', length: 200 })
     vehicle: string;
+
+    @ManyToOne(
+        () => User,
+        (client: User) => client.schedulings,
+    )
+    public client: User;
 
     @Column({ type: 'timestamptz', nullable: false })
     date: Date;

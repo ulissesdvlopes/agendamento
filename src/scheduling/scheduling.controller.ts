@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Post, Delete, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete, Patch, UseGuards, Req } from '@nestjs/common';
 import { SchedulingService } from './scheduling.service';
 import { CreateSchedulingDto } from './dtos/create-scheduling.dto';
 import { UpdateSchedulingDto } from './dtos/update-scheduling.dto';
 import { AuthGuard } from '@nestjs/passport';
+import RequestWithUser from 'src/auth/requestWithUser.interface';
 
 @Controller('scheduling')
 export class SchedulingController {
@@ -20,8 +21,9 @@ export class SchedulingController {
 
     @Post()
     @UseGuards(AuthGuard('jwt'))
-    create(@Body() createSchedulingDto: CreateSchedulingDto) {
-        return this.schedulingService.createScheduling(createSchedulingDto);
+    create(@Body() createSchedulingDto: CreateSchedulingDto, @Req() request: RequestWithUser) {
+        console.log(request.user);
+        return this.schedulingService.createScheduling(createSchedulingDto, request.user);
     }
 
     @Patch(':id')

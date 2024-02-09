@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsDate, MinLength, MinDate, IsEnum } from "class-validator";
 import { ServiceType } from "../scheduling.entity";
 import { Type } from "class-transformer";
+import { User } from "src/users/entities/user.entity";
 
 export class CreateSchedulingDto {
 

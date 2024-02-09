@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Scheduling } from 'src/scheduling/scheduling.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
  
 @Entity()
 export class User {
@@ -14,4 +15,10 @@ export class User {
     
     @Column()
     public password: string;
+
+    @OneToMany(
+        () => Scheduling,
+        (scheduling) => scheduling.client
+    )
+    schedulings: Scheduling[];
 }

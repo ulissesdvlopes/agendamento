@@ -11,9 +11,13 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post('register')
-    // @UseInterceptors(ClassSerializerInterceptor)
-    register(@Body() registerDto: RegisterDto) {
-        return this.authService.register(registerDto);
+    @UseInterceptors(ClassSerializerInterceptor)
+    async register(@Body() registerDto: RegisterDto, @Req() request: Request) {
+        const user = await this.authService.register(registerDto);
+        const cookie = this.authService.getCookieWithJwtToken(user);
+        request.res.setHeader('Set-Cookie', cookie);
+
+        return user
     }
 
     @HttpCode(200)

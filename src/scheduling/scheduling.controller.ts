@@ -18,9 +18,7 @@ export class SchedulingController {
     @Get(':id')
     @UseGuards(AuthGuard('jwt'))
     @UseInterceptors(ClassSerializerInterceptor)
-    getById(@Param('id') id: string, @Req() request: RequestWithUser) {
-        console.log('aqui');
-        
+    getById(@Param('id') id: string, @Req() request: RequestWithUser) {        
         return this.schedulingService.getSchedulingById(Number(id), request.user);
     }
 

@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { Scheduling } from 'src/scheduling/scheduling.entity';
+import { Scheduling } from '../../scheduling/scheduling.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
  
 @Entity()
